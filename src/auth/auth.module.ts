@@ -21,7 +21,6 @@ import { MailModule } from 'src/mail/mail.module';
   ],
   imports: [
     UsersModule,
-    ConfigModule,
     JwtModule.register({}),
     TokensModule,
     ResetTokensModule,
