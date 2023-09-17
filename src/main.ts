@@ -10,7 +10,10 @@ async function bootstrap() {
     .setTitle('KBA Team API')
     .setDescription('Here you can see all endpoints of our api')
     .setVersion('1.0')
-    .addTag('KBA')
+    .addTag('Auth')
+    .addTag('Users')
+    .addTag('Projects')
+    .addTag('Media')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
