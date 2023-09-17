@@ -16,6 +16,7 @@ import { ResetDto } from './dto/reset.dto';
 import { ResetTokensService } from 'src/reset-tokens/reset-tokens.service';
 import { MailService } from 'src/mail/mail.service';
 import { TokenExpires } from './tokenExpires';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -49,11 +50,15 @@ export class AuthService {
     return userWithoutPassword;
   }
 
-  async signUp(createUserDto: CreateUserDto): Promise<any> {
+  async register(createUserDto: CreateUserDto): Promise<any> {
     // Check if user exists
-    const userExists = await this.usersService.findByUsername(
+    let userExists = await this.usersService.findByUsername(
       createUserDto.username,
     );
+    if (userExists) {
+      throw new BadRequestException('User already exists');
+    }
+    userExists = await this.usersService.findByEmail(createUserDto.email);
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
@@ -64,12 +69,12 @@ export class AuthService {
       ...createUserDto,
       password: hash,
     });
-    const tokens = await this.getTokens(newUser.id, newUser.username);
+    const tokens = await this.getTokens(newUser);
     await this.saveRefreshToken(newUser.id, tokens.refreshToken);
     return tokens;
   }
 
-  async signIn(authDto: AuthDto) {
+  async login(authDto: AuthDto) {
     // Check if user exists
     const user = await this.usersService.findByUsername(authDto.username);
     if (!user) throw new BadRequestException('User does not exist');
@@ -81,7 +86,7 @@ export class AuthService {
     if (!passwordMatches)
       throw new BadRequestException('Password is incorrect');
 
-    const tokens = await this.getTokens(user.id, user.username);
+    const tokens = await this.getTokens(user);
     //await this.deleteExpiredUserTokens(user.id);
 
     // If there are more than a certain number of sessions, then delete the oldest session
@@ -115,7 +120,7 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    const tokens = await this.getTokens(user.id, user.username);
+    const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user.id, tokenDb.id, tokens.refreshToken);
     return tokens;
   }
@@ -204,27 +209,13 @@ export class AuthService {
     this.saveRefreshToken(userId, newRefreshToken);
   }
 
-  private async deleteExpiredUserTokens(userId: string) {
-    const userTokens = await this.tokensService.findAllByUserId(userId);
-    for (let i = 0; i < userTokens.length; i++) {
-      const token = userTokens[i];
-
-      try {
-        await this.jwtService.verifyAsync(token.refreshToken, {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        });
-      } catch (e) {
-        await this.tokensService.remove(token.id);
-      }
-    }
-  }
-
-  private async getTokens(userId: string, username: string) {
+  private async getTokens(user: UserDto) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          sub: user.id,
+          username: user.username,
+          roles: user.roles,
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -233,8 +224,9 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          sub: user.id,
+          username: user.username,
+          roles: user.roles,
         },
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),

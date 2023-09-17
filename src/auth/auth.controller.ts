@@ -1,45 +1,42 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { Request as RequestType } from 'express';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthDto } from './dto/auth.dto';
-import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
 import { ForgotDto } from './dto/forgot.dto';
 import { ResetDto } from './dto/reset.dto';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/roles/enums/role.enum';
+import { User } from 'src/common/decorators/user.decorator';
+import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
+import { UseRefreshToken } from 'src/common/decorators/use-refresh-token.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('signUp')
-  signUp(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
+  @Auth(Role.SuperAdmin)
+  @Post('register')
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 
-  @Post('signIn')
-  signin(@Body() data: AuthDto) {
-    return this.authService.signIn(data);
+  @Post('login')
+  login(@Body() data: AuthDto) {
+    return this.authService.login(data);
   }
 
-  @UseGuards(RefreshTokenGuard)
+  @UseRefreshToken()
   @Get('logout')
-  logout(@Request() req: RequestType) {
-    return this.authService.logout(req.user['refreshToken']);
+  logout(@User() user: UserFromAuth) {
+    return this.authService.logout(user.refreshToken);
   }
 
-  @UseGuards(RefreshTokenGuard)
+  @UseRefreshToken()
   @Get('refresh')
-  refreshTokens(@Request() req: RequestType) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  refreshTokens(@User() user: UserFromAuth) {
+    return this.authService.refreshTokens(user.sub, user.refreshToken);
   }
 
   @Post('forgot')
