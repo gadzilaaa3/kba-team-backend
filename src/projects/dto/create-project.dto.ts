@@ -2,13 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsUrl,
-  IsMongoId,
   IsArray,
   ValidateNested,
   IsDate,
   IsOptional,
 } from 'class-validator';
-import { User } from 'src/users/schemas/user.schema';
 
 export class CreateProjectDto {
   @ApiProperty({
@@ -16,17 +14,6 @@ export class CreateProjectDto {
     example: 'My First Project',
   })
   name: string;
-
-  @ApiPropertyOptional({
-    description: 'Project collaborators',
-    example: ['64f1f46663e662adc54dfcf2', '64f20cbdca560638cc1c27b7'],
-    type: [String],
-  })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => IsMongoId)
-  collaborators?: string[];
 
   @ApiPropertyOptional({
     description: 'Project deployment date',
@@ -64,4 +51,11 @@ export class CreateProjectDto {
   @ValidateNested({ each: true })
   @Type(() => IsUrl)
   images?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Project description',
+    example: 'Our best project.',
+  })
+  @IsOptional()
+  description?: string;
 }

@@ -26,6 +26,9 @@ export class Project {
 
   @Prop()
   images?: [String];
+
+  @Prop()
+  description?: string;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

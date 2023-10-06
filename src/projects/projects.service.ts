@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from './schemas/project.schema';
-import { Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
+import { WithPaginate } from 'src/common/pagination/with-paginate';
+import { Projection } from 'src/common/types/projectionType.type';
+import { FilterType } from 'src/common/types/filterType.type';
 
 @Injectable()
 export class ProjectsService {
@@ -15,36 +19,80 @@ export class ProjectsService {
     return (await this.projectModel.create({ ...createProjectDto, assigned }))
       .id;
   }
-  async findAll(): Promise<ProjectDocument[]> {
+
+  async findById(id: string, projection?: Projection<Project>) {
     return this.projectModel
-      .find()
-      .populate('assigned', 'username')
-      .populate('collaborators', 'username')
-      .exec();
+      .findById(id, projection)
+      .populate('assigned', {
+        password: 0,
+        roles: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+      })
+      .populate('collaborators', {
+        password: 0,
+        roles: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+      });
   }
 
-  // async findById(id: string): Promise<UserDocument> {
-  //   return this.userModel.findById(id);
-  // }
+  async findMany(
+    offset: number = 0,
+    limit: number = 20,
+    searchQuery?: string,
+    sortField: string = 'name',
+    fieldsQuery: string = '',
+  ): Promise<PaginateResponse<Project>> {
+    // Filter || Search
+    const regexp = new RegExp(searchQuery, 'i');
+    const filter = { name: regexp };
+    //
 
-  // async findByUsername(username: string): Promise<UserDocument> {
-  //   return this.userModel.findOne({ username });
-  // }
+    // Sort
+    const sortQuery = {};
+    if (sortField !== '') sortQuery[sortField] = 'descending';
+    //
 
-  // async findByEmail(email: string): Promise<UserDocument> {
-  //   return this.userModel.findOne({ email });
-  // }
+    // Fields
+    const fields = fieldsQuery.split(' ');
+    //
 
-  // async update(
-  //   id: string,
-  //   updateUserDto: UpdateUserDto,
-  // ): Promise<UserDocument> {
-  //   return this.userModel
-  //     .findByIdAndUpdate(id, updateUserDto, { new: true })
-  //     .exec();
-  // }
+    const query = this.projectModel.find(filter, fieldsQuery).sort(sortQuery);
 
-  // async remove(id: string): Promise<UserDocument> {
-  //   return this.userModel.findByIdAndDelete(id).exec();
-  // }
+    // Fields
+    if (
+      fields.includes('assigned') ||
+      (fieldsQuery === '' && !fields.includes('-assigned'))
+    ) {
+      query.populate('assigned', 'username');
+    }
+    if (
+      fields.includes('collaborators') ||
+      (fieldsQuery === '' && !fields.includes('-collaborators'))
+    ) {
+      query.populate('collaborators', 'username');
+    }
+    //
+
+    const total = await this.projectModel.countDocuments(filter);
+
+    return WithPaginate.paginate<Project>(query, offset, limit, total);
+  }
+
+  async update() {}
+
+  async delete(projectId: string, userId: string) {
+    const project = await this.projectModel.findOne({
+      _id: projectId,
+      assigned: userId,
+    });
+
+    if (project) {
+      return this.projectModel.findByIdAndDelete(projectId);
+    }
+    throw new ForbiddenException();
+  }
 }
