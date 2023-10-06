@@ -17,6 +17,10 @@ import { ResetTokensService } from 'src/reset-tokens/reset-tokens.service';
 import { MailService } from 'src/mail/mail.service';
 import { TokenExpires } from './tokenExpires';
 import { UserDto } from './dto/user.dto';
+import { Role } from 'src/roles/enums/role.enum';
+import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
+import { TokensDto } from './dto/tokens.dto';
+import { HashService } from 'src/common/services/hash.service';
 
 @Injectable()
 export class AuthService {
@@ -32,39 +36,25 @@ export class AuthService {
   private static countUserSession = 2;
   private static saltRounds = 15;
 
-  async validateUser(
-    username: string,
-    pass: string,
-  ): Promise<UserWithoutPassword> {
-    const user = await this.usersService.findByUsername(username);
-    if (!user) {
-      return null;
-    }
-
-    const comparingResult = await bcrypt.compare(pass, user.password);
-    if (!comparingResult) {
-      return null;
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
-
-  async register(createUserDto: CreateUserDto): Promise<any> {
+  async register(createUserDto: CreateUserDto): Promise<TokensDto> {
     // Check if user exists
-    let userExists = await this.usersService.findByUsername(
-      createUserDto.username,
+    let userExists = await this.usersService.findOne(
+      { username: createUserDto.username },
+      { _id: true },
     );
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
-    userExists = await this.usersService.findByEmail(createUserDto.email);
+    userExists = await this.usersService.findOne(
+      { email: createUserDto.email },
+      { _id: true },
+    );
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
 
     // Hash password
-    const hash = await this.hashData(createUserDto.password);
+    const hash = await HashService.hashData(createUserDto.password);
     const newUser = await this.usersService.create({
       ...createUserDto,
       password: hash,
@@ -74,9 +64,19 @@ export class AuthService {
     return tokens;
   }
 
-  async login(authDto: AuthDto) {
+  async login(authDto: AuthDto): Promise<TokensDto> {
     // Check if user exists
-    const user = await this.usersService.findByUsername(authDto.username);
+    const user = await this.usersService.findOne(
+      {
+        username: authDto.username,
+      },
+      {
+        _id: true,
+        username: true,
+        password: true,
+        roles: true,
+      },
+    );
     if (!user) throw new BadRequestException('User does not exist');
 
     const passwordMatches = await bcrypt.compare(
@@ -96,7 +96,7 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(refreshToken: string) {
+  async logout(refreshToken: string): Promise<void> {
     const token = await this.tokensService.findOneByToken(refreshToken);
     if (!token) {
       throw new ForbiddenException();
@@ -104,8 +104,11 @@ export class AuthService {
     await this.tokensService.remove(token.id);
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.usersService.findById(userId);
+  async refreshTokens(
+    userId: string,
+    refreshToken: string,
+  ): Promise<TokensDto> {
+    const user = await this.usersService.findById(userId, { password: 0 });
     if (!user) {
       throw new ForbiddenException('Access Denied');
     }
@@ -125,8 +128,10 @@ export class AuthService {
     return tokens;
   }
 
-  async forgotPassword(forgotDto: ForgotDto) {
-    const user = await this.usersService.findByEmail(forgotDto.email);
+  async forgotPassword(forgotDto: ForgotDto): Promise<void> {
+    const user = await this.usersService.findOne({
+      email: forgotDto.email,
+    });
 
     if (!user) {
       throw new BadRequestException('This user does not exist');
@@ -140,13 +145,14 @@ export class AuthService {
       userId: user.id,
       token,
     };
-    this.resetTokensService.create(createResetTokenDto);
-
-    this.mailService.sendForgotToken(user, token);
+    await this.resetTokensService.create(createResetTokenDto);
+    await this.mailService.sendForgotToken(user, token);
   }
 
-  async resetPassword(resetDto: ResetDto) {
-    const user = await this.usersService.findByEmail(resetDto.email);
+  async resetPassword(resetDto: ResetDto): Promise<void> {
+    const user = await this.usersService.findOne({
+      email: resetDto.email,
+    });
     if (!user) {
       throw new BadRequestException('This user does not exist');
     }
@@ -159,29 +165,27 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    const hashedPassword = await this.hashData(resetDto.password);
+    const hashedPassword = await HashService.hashData(resetDto.password);
     const updatedUser = { password: hashedPassword };
     await this.usersService.update(user.id, updatedUser);
     await this.resetTokensService.removeAllUserTokens(user.id);
   }
 
   private async generateResetToken(email: string): Promise<string> {
-    return await this.hashData(`${email}` + new Date());
+    return await HashService.hashData(`${email}` + new Date());
   }
 
-  private async checkCountUserSessions(userId: string) {
+  private async checkCountUserSessions(userId: string): Promise<void> {
     const tokens = await this.tokensService.findAllByUserId(userId);
     if (tokens.length >= AuthService.countUserSession) {
       this.tokensService.remove(tokens[0].id);
     }
   }
 
-  private async hashData(data: string) {
-    const salt = await bcrypt.genSalt(AuthService.saltRounds);
-    return await bcrypt.hash(data, salt);
-  }
-
-  private async saveRefreshToken(userId: string, refreshToken: string) {
+  private async saveRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
     const delayInSeconds = 5;
 
     const expiresIn = new Date();
@@ -204,12 +208,12 @@ export class AuthService {
     userId: string,
     oldRefreshTokenId: string,
     newRefreshToken: string,
-  ) {
+  ): Promise<void> {
     await this.tokensService.remove(oldRefreshTokenId);
     this.saveRefreshToken(userId, newRefreshToken);
   }
 
-  private async getTokens(user: UserDto) {
+  private async getTokens(user: UserDto): Promise<TokensDto> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
