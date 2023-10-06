@@ -1,5 +1,152 @@
-<p>Hey {{ username }},</p>
-<p>Please copy this token to continue </p>
-<p>
-	<b> {{ token }} </b>
-</p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Josefin+Sans:regular,700"
+      rel="stylesheet"
+    />
+    <style>
+			/*---ОБНУЛЕНИЕ------------------------------------------------*/
+*{padding: 0;margin: 0;border: 0;}
+*,*:before,*:after{-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box;}
+:focus,:active{outline: none;}
+a:focus,a:active{outline: none;}
+nav,footer,header,aside{display: block;}
+html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:20px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
+input,button,textarea{font-family:inherit;}
+input::-ms-clear{display: none;}
+button{cursor: pointer;}
+button::-moz-focus-inner {padding:0;border:0;}
+a,a:visited{text-decoration: none;}
+a:hover{text-decoration: none;}
+ul li{list-style: none;}
+img{vertical-align: top;}
+h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight: inherit;}
+/*---------------------------------------------------*/
+
+/*---COMMON------------------------------------------------*/
+  body{
+  font-family: "Josefin Sans", sans-serif;
+  background: #E8E8E8;
+}
+.wrapper {
+  min-height: 100%;
+  overflow: hidden;
+}
+._container {
+  padding: 40px 60px;
+  min-width: 320px;
+}
+/*---------------------------------------------------*/
+
+/*---CONTENT------------------------------------------------*/
+.content-row {
+  width: 100%;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.content-column {
+  display: flex;
+  align-items: center;
+  min-width: 190px;
+  align-self: stretch;
+}
+.gap-40 {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.content__title {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  align-self: stretch;
+}
+.content__logo-column {
+}
+.logo {
+}
+.greetings-column {
+}
+.greetings-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.Hey {
+  font-size: 45px;
+  font-weight: 700;
+  color: #3A3A3A;
+}
+.username {
+  font-size: 25px;
+  font-weight: 700;
+  color: #FA726F;
+}
+.content__description {
+  text-align: justify;
+}
+.content__token {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 10px;
+  height: fit-content;
+  padding: 16px;
+  background-color: #3A3A3A;
+  border-radius: 20px;
+  box-shadow: 0px 14px 42px -1px rgba(0, 0, 0, 0.10);
+}
+.copy-icon {
+  width: 20px;
+}
+.token {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+/*---------------------------------------------------*/
+
+@media (max-width: 529px) {
+  .content-row {
+    width: 100%;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+		</style>
+  </head>
+  <body>
+   <div class="wrapper">
+      <div class="_container">
+         <div class="content-row">
+            <div class="content-column gap-40">
+              <div class="content__title">
+                <div class="greetings-column greetings-row">
+                  <p class="Hey">Hey</p>
+                  <p class="username">{{ username }}</p>
+                </div>
+              </div>
+              <div class="content__description">
+                <p>Please copy this token to continue</p>
+              </div>
+            </div>
+            <div class="content-column">
+              <div class="content__token">
+                <p id="token" class="token">{{ token }}</p>
+              </div>
+            </div>
+         </div>
+      </div>
+   </div>
+  </body>
+</html>
