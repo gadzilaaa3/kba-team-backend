@@ -5,13 +5,15 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from 'src/roles/enums/role.enum';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateRolesDto } from './dto/update-roles.dto';
+import { FindManyParams } from 'src/common/pagination/findManyParams';
 
 @ApiTags('Users')
 @Controller('users')
@@ -20,14 +22,21 @@ export class UsersController {
 
   @Auth(Role.Admin)
   @Get()
-  async findAll() {
-    return this.usersService.findAll();
+  async findMany(@Query() findManyParams: FindManyParams) {
+    console.log(findManyParams.fields);
+    return this.usersService.findMany(
+      findManyParams.offset,
+      findManyParams.limit,
+      findManyParams.search,
+      findManyParams.sort,
+      findManyParams.fields,
+    );
   }
 
   @Auth(Role.Admin)
   @Get(':id')
   findById(@Param('id') id: string) {
-    return this.usersService.findById(id);
+    return this.usersService.findById(id, { password: 0 });
   }
 
   @Patch(':id')
@@ -39,5 +48,11 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Auth(Role.SuperAdmin)
+  @Patch(':id/roles')
+  setRoles(@Param('id') id: string, @Body() { roles }: UpdateRolesDto) {
+    return this.usersService.setRoles(id, roles);
   }
 }
