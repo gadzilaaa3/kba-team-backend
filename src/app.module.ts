@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { TokensModule } from './tokens/tokens.module';
 import { MailModule } from './mail/mail.module';
 import { ResetTokensModule } from './reset-tokens/reset-tokens.module';
+import { ContactsModule } from './contacts/contacts.module';
+import { ActivitiesModule } from './activities/activities.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { ResetTokensModule } from './reset-tokens/reset-tokens.module';
     TokensModule,
     MailModule,
     ResetTokensModule,
+    ContactsModule,
+    ActivitiesModule,
   ],
   controllers: [],
   providers: [],
