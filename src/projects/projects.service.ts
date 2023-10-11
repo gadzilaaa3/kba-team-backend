@@ -42,15 +42,10 @@ export class ProjectsService {
   async findMany(
     offset: number = 0,
     limit: number = 20,
-    searchQuery?: string,
     sortField: string = 'name',
     fieldsQuery: string = '',
+    filter?: FilterType<Project>,
   ): Promise<PaginateResponse<Project>> {
-    // Filter || Search
-    const regexp = new RegExp(searchQuery, 'i');
-    const filter = { name: regexp };
-    //
-
     // Sort
     const sortQuery = {};
     if (sortField !== '') sortQuery[sortField] = 'descending';

@@ -17,6 +17,8 @@ export class ActivitiesService {
     id: string,
     updateActivitiesDto: UpdateActivitiesDto,
   ): Promise<ActivitiesDocument> {
-    return this.activitiesModel.findByIdAndUpdate(id, updateActivitiesDto);
+    return this.activitiesModel.findByIdAndUpdate(id, updateActivitiesDto, {
+      new: true,
+    });
   }
 }

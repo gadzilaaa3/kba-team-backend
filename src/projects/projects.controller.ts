@@ -29,17 +29,10 @@ export class ProjectsController {
   @Get()
   findMany(
     @Query() { offset, limit }: PaginationParams,
-    @Query('search') searchQuery: string,
     @Query('sort') sort: string,
     @Query('fields') fields: string,
   ): Promise<PaginateResponse<Project>> {
-    return this.projectsService.findMany(
-      offset,
-      limit,
-      searchQuery,
-      sort,
-      fields,
-    );
+    return this.projectsService.findMany(offset, limit, sort, fields);
   }
 
   @Auth(Role.Admin)

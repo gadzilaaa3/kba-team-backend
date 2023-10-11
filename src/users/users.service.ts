@@ -20,10 +20,17 @@ export class UsersService {
     private contactsModel: ContactsService,
     private activitiesModel: ActivitiesService,
   ) {}
-  async findById(id: string, projection?: Projection<User>) {
-    return this.userModel
-      .findById(id, projection)
-      .populate(['contacts', 'activities']);
+  async findById(
+    id: string,
+    projection?: Projection<User>,
+    withPopulate = true,
+  ) {
+    if (withPopulate) {
+      return this.userModel
+        .findById(id, projection)
+        .populate(['contacts', 'activities']);
+    }
+    return this.userModel.findById(id, projection);
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {

@@ -13,6 +13,7 @@ import { MailModule } from './mail/mail.module';
 import { ResetTokensModule } from './reset-tokens/reset-tokens.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { ActivitiesModule } from './activities/activities.module';
+import { MeModule } from './me/me.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ActivitiesModule } from './activities/activities.module';
     ResetTokensModule,
     ContactsModule,
     ActivitiesModule,
+    MeModule,
   ],
   controllers: [],
   providers: [],
