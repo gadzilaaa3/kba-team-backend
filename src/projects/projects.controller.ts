@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -19,13 +20,14 @@ import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { Project } from './schemas/project.schema';
 import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
 import { ValidateMongoId } from 'src/common/pipes/mongoId.pipe';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { UpdateCollaboratorsDto } from './dto/update-collaborators.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 
-  @Auth(Role.Admin)
   @Get()
   findMany(
     @Query() { offset, limit }: PaginationParams,
@@ -35,7 +37,6 @@ export class ProjectsController {
     return this.projectsService.findMany(offset, limit, sort, fields);
   }
 
-  @Auth(Role.Admin)
   @Get(':id')
   findById(
     @Param('id', ValidateMongoId)
@@ -53,13 +54,62 @@ export class ProjectsController {
     return this.projectsService.create(createProjectDto, user.sub);
   }
 
-  @Auth(Role.Admin)
-  @Patch()
-  update() {}
+  @Auth(Role.Admin, Role.SuperAdmin)
+  @Patch(':id')
+  async update(
+    @Param('id', ValidateMongoId) id: string,
+    @User() user: UserFromAuth,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    await this.checkAvailability(id, user);
+    return this.projectsService.update(id, updateProjectDto);
+  }
 
-  @Auth(Role.Admin)
+  @Auth(Role.Admin, Role.SuperAdmin)
   @Delete(':id')
-  delete(@Param('id', ValidateMongoId) id: string, @User() user: UserFromAuth) {
-    return this.projectsService.delete(id, user.sub);
+  async delete(
+    @Param('id', ValidateMongoId) id: string,
+    @User() user: UserFromAuth,
+  ) {
+    await this.checkAvailability(id, user);
+    return this.projectsService.delete(id);
+  }
+
+  @Auth(Role.Admin, Role.SuperAdmin)
+  @Patch(':id/collaborators/add')
+  async addCollaborator(
+    @Param('id', ValidateMongoId) id: string,
+    @User() user: UserFromAuth,
+    @Body() updateCollaboratorsDto: UpdateCollaboratorsDto,
+  ) {
+    await this.checkAvailability(id, user);
+    return this.projectsService.addCollaborator(id, updateCollaboratorsDto);
+  }
+
+  @Auth(Role.Admin, Role.SuperAdmin)
+  @Patch(':id/collaborators/remove')
+  async removeCollaborator(
+    @Param('id', ValidateMongoId) id: string,
+    @User() user: UserFromAuth,
+    @Body() updateCollaboratorsDto: UpdateCollaboratorsDto,
+  ) {
+    await this.checkAvailability(id, user);
+    return this.projectsService.removeCollaborator(id, updateCollaboratorsDto);
+  }
+
+  private async checkAvailability(projectId: string, user: UserFromAuth) {
+    if (user.roles.includes(Role.SuperAdmin)) {
+      return true;
+    }
+
+    const project = await this.projectsService.findOne({
+      _id: projectId,
+      assigned: user.sub,
+    });
+
+    if (project) {
+      return true;
+    }
+    throw new ForbiddenException();
   }
 }

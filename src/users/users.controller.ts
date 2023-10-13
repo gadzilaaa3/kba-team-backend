@@ -20,7 +20,7 @@ import { FindManyParams } from 'src/common/pagination/findManyParams';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Auth(Role.Admin)
+  @Auth(Role.SuperAdmin)
   @Get()
   async findMany(@Query() findManyParams: FindManyParams) {
     console.log(findManyParams.fields);
@@ -33,12 +33,13 @@ export class UsersController {
     );
   }
 
-  @Auth(Role.Admin)
+  @Auth(Role.SuperAdmin)
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(id, { password: 0 });
   }
 
+  @Auth(Role.SuperAdmin)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
