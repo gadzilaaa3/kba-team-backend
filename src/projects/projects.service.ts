@@ -79,16 +79,10 @@ export class ProjectsService {
     const query = this.projectModel.find(filter, fieldsQuery).sort(sortQuery);
 
     // Fields
-    if (
-      fields.includes('assigned') ||
-      (fieldsQuery === '' && !fields.includes('-assigned'))
-    ) {
+    if (!fields.includes('-assigned')) {
       query.populate('assigned', 'username');
     }
-    if (
-      fields.includes('collaborators') ||
-      (fieldsQuery === '' && !fields.includes('-collaborators'))
-    ) {
+    if (!fields.includes('-collaborators')) {
       query.populate('collaborators', 'username');
     }
     //
@@ -99,13 +93,14 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
-    return this.projectModel.findOneAndUpdate(
-      {
-        id: id,
-      },
-      updateProjectDto,
-      { new: true },
-    );
+    const project = await this.findById(id, { id: true });
+    if (!project) {
+      throw new BadRequestException('There is no such project');
+    }
+
+    return this.projectModel.findByIdAndUpdate(id, updateProjectDto, {
+      new: true,
+    });
   }
 
   async delete(projectId: string) {

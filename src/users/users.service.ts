@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpCode, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -11,6 +11,7 @@ import { ActivitiesService } from 'src/activities/activities.service';
 import { ContactsService } from 'src/contacts/contacts.service';
 import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
 
 @Injectable()
 export class UsersService {
@@ -20,16 +21,8 @@ export class UsersService {
     private contactsModel: ContactsService,
     private activitiesModel: ActivitiesService,
   ) {}
-  async findById(
-    id: string,
-    projection?: Projection<User>,
-    withPopulate = true,
-  ) {
-    if (withPopulate) {
-      return this.userModel
-        .findById(id, projection)
-        .populate(['contacts', 'activities']);
-    }
+
+  async findById(id: string, projection?: Projection<User>) {
     return this.userModel.findById(id, projection);
   }
 
@@ -43,29 +36,16 @@ export class UsersService {
   }
 
   async findMany(
-    offset: number = 0,
-    limit: number = 20,
-    searchQuery?: string,
-    sortField: string = 'username',
-    fieldsQuery: string = '',
+    paginationParams: PaginationParams,
   ): Promise<PaginateResponse<User>> {
-    // Filter || Search
-    const regexp = new RegExp(searchQuery, 'i');
-    const filter = { username: regexp };
-    //
-
-    // Sort
-    const sortQuery = {};
-    if (sortField !== '') sortQuery[sortField] = 'descending';
-    //
-
-    fieldsQuery += ' -password';
-
-    const query = this.userModel.find(filter, fieldsQuery).sort(sortQuery);
-
-    const total = await this.userModel.countDocuments(filter);
-
-    return WithPaginate.paginate<User>(query, offset, limit, total);
+    const query = this.userModel.find();
+    const total = await this.userModel.countDocuments();
+    return WithPaginate.paginate<User>(
+      query,
+      paginationParams.offset,
+      paginationParams.limit,
+      total,
+    );
   }
 
   async update(
@@ -87,6 +67,15 @@ export class UsersService {
 
   async setRoles(userId: string, roles: Role[]) {
     const user = await this.findById(userId, { roles: 1 });
+
+    if (
+      user.roles.includes(Role.SuperAdmin) &&
+      !roles.includes(Role.SuperAdmin)
+    ) {
+      throw new BadRequestException(
+        'You cannot deprive a user of the super admin role',
+      );
+    }
 
     const rolesSet = new Set(roles);
     const rolesArray = Array(...rolesSet);

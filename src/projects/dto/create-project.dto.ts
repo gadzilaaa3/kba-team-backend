@@ -6,6 +6,7 @@ import {
   ValidateNested,
   IsDate,
   IsOptional,
+  Validate,
 } from 'class-validator';
 
 export class CreateProjectDto {
@@ -21,6 +22,7 @@ export class CreateProjectDto {
   })
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   deploymentDate?: Date;
 
   @ApiPropertyOptional({
@@ -48,8 +50,7 @@ export class CreateProjectDto {
   })
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => IsUrl)
+  @IsUrl({}, { each: true })
   images?: string[];
 
   @ApiPropertyOptional({

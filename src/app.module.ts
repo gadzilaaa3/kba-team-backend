@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
-import { LinksModule } from './links/links.module';
 import { ImagesModule } from './images/images.module';
-import { TechnologiesModule } from './technologies/technologies.module';
 import { ProjectsModule } from './projects/projects.module';
 import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
@@ -25,9 +23,7 @@ import { MeModule } from './me/me.module';
       inject: [ConfigService],
     }),
     UsersModule,
-    LinksModule,
     ImagesModule,
-    TechnologiesModule,
     ProjectsModule,
     RolesModule,
     AuthModule,

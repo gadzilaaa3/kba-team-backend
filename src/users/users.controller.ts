@@ -13,7 +13,7 @@ import { Role } from 'src/roles/enums/role.enum';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateRolesDto } from './dto/update-roles.dto';
-import { FindManyParams } from 'src/common/pagination/findManyParams';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
 
 @ApiTags('Users')
 @Controller('users')
@@ -22,15 +22,8 @@ export class UsersController {
 
   @Auth(Role.SuperAdmin)
   @Get()
-  async findMany(@Query() findManyParams: FindManyParams) {
-    console.log(findManyParams.fields);
-    return this.usersService.findMany(
-      findManyParams.offset,
-      findManyParams.limit,
-      findManyParams.search,
-      findManyParams.sort,
-      findManyParams.fields,
-    );
+  async findMany(@Query() paginationParams: PaginationParams) {
+    return this.usersService.findMany(paginationParams);
   }
 
   @Auth(Role.SuperAdmin)

@@ -60,15 +60,4 @@ export class UpdateProjectDto {
   })
   @IsOptional()
   description?: string;
-
-  @ApiPropertyOptional({
-    description: 'Project collaborators',
-    example: ['650b2fc08e86051bcefa9acd', '64f1f46663e662adc54dfcf2'],
-    type: [String],
-  })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => IsMongoId)
-  collaborators?: string[];
 }

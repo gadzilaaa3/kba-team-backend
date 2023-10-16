@@ -33,8 +33,11 @@ export class ProjectsController {
     @Query() { offset, limit }: PaginationParams,
     @Query('sort') sort: string,
     @Query('fields') fields: string,
+    @Query('search') search: string = '',
   ): Promise<PaginateResponse<Project>> {
-    return this.projectsService.findMany(offset, limit, sort, fields);
+    return this.projectsService.findMany(offset, limit, sort, fields, {
+      name: new RegExp(search, 'i'),
+    });
   }
 
   @Get(':id')
