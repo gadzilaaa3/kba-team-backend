@@ -12,6 +12,8 @@ import { ResetTokensModule } from './reset-tokens/reset-tokens.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { MeModule } from './me/me.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -22,6 +24,12 @@ import { MeModule } from './me/me.module';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
     UsersModule,
     ImagesModule,
     ProjectsModule,
@@ -35,6 +43,11 @@ import { MeModule } from './me/me.module';
     MeModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
