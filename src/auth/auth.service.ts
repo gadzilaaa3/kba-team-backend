@@ -1,12 +1,13 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
-import { UserWithoutPassword } from './interfaces/userWithoutPassword';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { TokensService } from 'src/tokens/tokens.service';
@@ -17,8 +18,6 @@ import { ResetTokensService } from 'src/reset-tokens/reset-tokens.service';
 import { MailService } from 'src/mail/mail.service';
 import { TokenExpires } from './tokenExpires';
 import { UserDto } from './dto/user.dto';
-import { Role } from 'src/roles/enums/role.enum';
-import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
 import { TokensDto } from './dto/tokens.dto';
 import { HashService } from 'src/common/services/hash.service';
 
@@ -34,7 +33,6 @@ export class AuthService {
   ) {}
 
   private static countUserSession = 2;
-  private static saltRounds = 15;
 
   async register(createUserDto: CreateUserDto): Promise<TokensDto> {
     // Check if user exists
@@ -43,14 +41,14 @@ export class AuthService {
       { _id: true },
     );
     if (userExists) {
-      throw new BadRequestException('User already exists');
+      throw new ConflictException('User already exists');
     }
     userExists = await this.usersService.findOne(
       { email: createUserDto.email },
       { _id: true },
     );
     if (userExists) {
-      throw new BadRequestException('User already exists');
+      throw new ConflictException('User already exists');
     }
 
     // Hash password
@@ -77,7 +75,7 @@ export class AuthService {
         roles: true,
       },
     );
-    if (!user) throw new BadRequestException('User does not exist');
+    if (!user) throw new NotFoundException('User does not exist');
 
     const passwordMatches = await bcrypt.compare(
       authDto.password,
@@ -134,7 +132,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException('This user does not exist');
+      throw new NotFoundException('This user does not exist');
     }
 
     await this.resetTokensService.removeAllUserTokens(user.id);
@@ -154,7 +152,7 @@ export class AuthService {
       email: resetDto.email,
     });
     if (!user) {
-      throw new BadRequestException('This user does not exist');
+      throw new NotFoundException('This user does not exist');
     }
 
     const resetToken = await this.resetTokensService.findOneByUserId(user.id);

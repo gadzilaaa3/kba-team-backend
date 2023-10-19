@@ -9,7 +9,9 @@ import { UpdateContactsDto } from 'src/contacts/dto/update-contacts.dto';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
 import { Project } from 'src/projects/schemas/project.schema';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Me')
 @Controller('me')
 export class MeController {
   constructor(private meService: MeService) {}
