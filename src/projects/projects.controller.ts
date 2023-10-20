@@ -18,7 +18,7 @@ import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { Project } from './schemas/project.schema';
-import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
+import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { ValidateMongoId } from 'src/common/pipes/mongoId.pipe';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UpdateCollaboratorsDto } from './dto/update-collaborators.dto';
@@ -34,7 +34,7 @@ export class ProjectsController {
     @Query('sort') sort: string,
     @Query('fields') fields: string,
     @Query('search') search: string = '',
-  ): Promise<PaginateResponse<Project>> {
+  ): Promise<PaginatedResponse<Project>> {
     return this.projectsService.findMany(offset, limit, sort, fields, {
       name: new RegExp(search, 'i'),
     });

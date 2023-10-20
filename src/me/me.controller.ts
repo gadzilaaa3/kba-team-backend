@@ -7,7 +7,7 @@ import { MeService } from './me.service';
 import { UpdateActivitiesDto } from 'src/activities/dto/update-activities.dto';
 import { UpdateContactsDto } from 'src/contacts/dto/update-contacts.dto';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
+import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { Project } from 'src/projects/schemas/project.schema';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -59,7 +59,7 @@ export class MeController {
     @Query() { offset, limit }: PaginationParams,
     @Query('sort') sort: string,
     @Query('fields') fields: string,
-  ): Promise<PaginateResponse<Project>> {
+  ): Promise<PaginatedResponse<Project>> {
     return this.meService.getAssignedProjects(
       user.sub,
       offset,
@@ -76,7 +76,7 @@ export class MeController {
     @Query() { offset, limit }: PaginationParams,
     @Query('sort') sort: string,
     @Query('fields') fields: string,
-  ): Promise<PaginateResponse<Project>> {
+  ): Promise<PaginatedResponse<Project>> {
     return this.meService.getUserProjects(
       user.sub,
       offset,

@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { PaginateResponse } from './types/pagination-response.type';
+import { PaginatedResponse } from './types/pagination-response.type';
 import {
   PaginateResponseWithQuery,
   PaginationQuery,
@@ -13,7 +13,7 @@ export class WithPaginate {
     offset: number,
     limit: number,
     total: number,
-  ): Promise<PaginateResponse<Schema>> {
+  ): Promise<PaginatedResponse<Schema>> {
     if (limit > WithPaginate.limit) limit = WithPaginate.limit;
 
     const items = await query.skip(offset).limit(limit).exec();
@@ -49,7 +49,7 @@ export class WithPaginate {
   // Not stable
   static async getPaginateResponse<Schema>(
     paginateResponseWithQuery: PaginateResponseWithQuery<Schema>,
-  ): Promise<PaginateResponse<Schema>> {
+  ): Promise<PaginatedResponse<Schema>> {
     return {
       limit: paginateResponseWithQuery.limit,
       offset: paginateResponseWithQuery.offset,

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from './schemas/project.schema';
 import { Model } from 'mongoose';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
+import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
 import { Projection } from 'src/common/types/projectionType.type';
 import { FilterType } from 'src/common/types/filterType.type';
@@ -66,7 +66,7 @@ export class ProjectsService {
     sortField: string = 'name',
     fieldsQuery: string = '',
     filter?: FilterType<Project>,
-  ): Promise<PaginateResponse<Project>> {
+  ): Promise<PaginatedResponse<Project>> {
     // Sort
     const sortQuery = {};
     if (sortField !== '') sortQuery[sortField] = 'descending';

@@ -1,4 +1,10 @@
-import { BadRequestException, HttpCode, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpCode,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -9,7 +15,7 @@ import { Projection } from 'src/common/types/projectionType.type';
 import { FilterType } from 'src/common/types/filterType.type';
 import { ActivitiesService } from 'src/activities/activities.service';
 import { ContactsService } from 'src/contacts/contacts.service';
-import { PaginateResponse } from 'src/common/pagination/types/pagination-response.type';
+import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
 
@@ -37,8 +43,8 @@ export class UsersService {
 
   async findMany(
     paginationParams: PaginationParams,
-  ): Promise<PaginateResponse<User>> {
-    const query = this.userModel.find();
+  ): Promise<PaginatedResponse<User>> {
+    const query = this.userModel.find({}, { roles: 0 });
     const total = await this.userModel.countDocuments();
     return WithPaginate.paginate<User>(
       query,
@@ -53,7 +59,10 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Promise<UserDocument> {
     return this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+        projection: { roles: 0 },
+      })
       .exec();
   }
 
@@ -68,11 +77,15 @@ export class UsersService {
   async setRoles(userId: string, roles: Role[]) {
     const user = await this.findById(userId, { roles: 1 });
 
+    if (!user) {
+      throw new NotFoundException('There is no such user');
+    }
+
     if (
       user.roles.includes(Role.SuperAdmin) &&
       !roles.includes(Role.SuperAdmin)
     ) {
-      throw new BadRequestException(
+      throw new ConflictException(
         'You cannot deprive a user of the super admin role',
       );
     }
