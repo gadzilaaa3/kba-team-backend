@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from './schemas/project.schema';
 import { Model } from 'mongoose';
@@ -113,12 +118,12 @@ export class ProjectsService {
       { username: true, email: true },
     );
     if (!user) {
-      throw new BadRequestException('There is no such user');
+      throw new NotFoundException('There is no such user');
     }
 
     const project = await this.findById(id);
     if (!project) {
-      throw new BadRequestException('There is no such project');
+      throw new NotFoundException('There is no such project');
     }
 
     const collaboratorInProject = project.collaborators.some((collaborator) => {
@@ -127,7 +132,7 @@ export class ProjectsService {
     if (!collaboratorInProject) {
       project.collaborators.push(user);
     } else {
-      throw new BadRequestException(
+      throw new ConflictException(
         'This user is already a collaborator of the project',
       );
     }
@@ -140,16 +145,16 @@ export class ProjectsService {
       { username: true, email: true },
     );
     if (!user) {
-      throw new BadRequestException('There is no such user');
+      throw new NotFoundException('There is no such user');
     }
 
     const project = await this.findById(id);
     if (!project) {
-      throw new BadRequestException('There is no such project');
+      throw new NotFoundException('There is no such project');
     }
 
     if (project.assigned.username === user.username) {
-      throw new BadRequestException(
+      throw new ConflictException(
         'You cannot remove yourself from the project collaborators',
       );
     }

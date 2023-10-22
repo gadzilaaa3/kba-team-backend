@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   Param,
@@ -9,7 +8,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from 'src/roles/enums/role.enum';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import {
@@ -27,8 +25,9 @@ import {
 } from '@nestjs/swagger';
 import { UpdateRolesDto } from './dto/update-roles.dto';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { PaginatedDto, UserDto } from './user.interface';
+import { UserDto } from './user.interface';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
+import { PaginatedDto } from 'src/common/interfaces/paginated.dto';
 
 @ApiTags('Users')
 @Controller('users')

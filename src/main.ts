@@ -6,6 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('KBA Team API')
     .setDescription('Here you can see all endpoints of our api')
