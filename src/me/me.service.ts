@@ -43,40 +43,4 @@ export class MeService {
     const contactsId = user.activities as string;
     return this.contactsService.update(contactsId, updateContactsDto);
   }
-
-  async getAssignedProjects(
-    userId: string,
-    offset: number = 0,
-    sortField: string = 'name',
-    limit?: number,
-    fieldsQuery: string = '',
-  ) {
-    return this.projectsService.findMany(
-      offset,
-      limit,
-      sortField,
-      fieldsQuery,
-      {
-        assigned: userId,
-      },
-    );
-  }
-
-  async getUserProjects(
-    userId: string,
-    offset: number = 0,
-    sortField: string = 'name',
-    limit?: number,
-    fieldsQuery: string = '',
-  ) {
-    return this.projectsService.findMany(
-      offset,
-      limit,
-      sortField,
-      fieldsQuery,
-      {
-        collaborators: userId,
-      },
-    );
-  }
 }

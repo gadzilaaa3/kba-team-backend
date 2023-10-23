@@ -68,29 +68,12 @@ export class ProjectsService {
   async findMany(
     offset: number = 0,
     limit: number = 20,
-    sortField: string = 'name',
-    fieldsQuery: string = '',
     filter?: FilterType<Project>,
   ): Promise<PaginatedResponse<Project>> {
-    // Sort
-    const sortQuery = {};
-    if (sortField !== '') sortQuery[sortField] = 'descending';
-    //
+    const query = this.projectModel.find(filter);
 
-    // Fields
-    const fields = fieldsQuery.split(' ');
-    //
-
-    const query = this.projectModel.find(filter, fieldsQuery).sort(sortQuery);
-
-    // Fields
-    if (!fields.includes('-assigned')) {
-      query.populate('assigned', 'username');
-    }
-    if (!fields.includes('-collaborators')) {
-      query.populate('collaborators', 'username');
-    }
-    //
+    query.populate('assigned', 'username');
+    query.populate('collaborators', 'username');
 
     const total = await this.projectModel.countDocuments(filter);
 
@@ -171,5 +154,33 @@ export class ProjectsService {
     }
 
     return project.save();
+  }
+
+  async getAssignedProjects(
+    username: string,
+    offset: number = 0,
+    limit?: number,
+  ) {
+    const user = await this.usersService.findOne({ username }, { id: 1 });
+
+    if (!user) {
+      throw new NotFoundException('There is no user with such username.');
+    }
+
+    return this.findMany(offset, limit, {
+      assigned: user.id,
+    });
+  }
+
+  async getUserProjects(username: string, offset: number = 0, limit?: number) {
+    const user = await this.usersService.findOne({ username }, { id: 1 });
+
+    if (!user) {
+      throw new NotFoundException('There is no user with such username.');
+    }
+
+    return this.findMany(offset, limit, {
+      collaborators: user.id,
+    });
   }
 }

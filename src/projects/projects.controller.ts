@@ -60,6 +60,36 @@ export class ProjectsController {
     return this.projectsService.findMany(offset, limit);
   }
 
+  @ApiOperation({ description: 'Get a list of projects created by the user.' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  @ApiBadRequestResponse({
+    description: 'Bad Request: check query parameters.',
+  })
+  @ApiNotFoundResponse({ description: 'Not Found: there is no such user.' })
+  @ApiPaginatedResponse(ProjectDto)
+  @Get('assigned/:username')
+  async getUserAssignedProjects(
+    @Param('username') username: string,
+    @Query() { offset, limit }: PaginationParams,
+  ) {
+    return this.projectsService.getAssignedProjects(username, offset, limit);
+  }
+
+  @ApiOperation({ description: 'Get user projects as a collaborator.' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  @ApiBadRequestResponse({
+    description: 'Bad Request: check query parameters.',
+  })
+  @ApiNotFoundResponse({ description: 'Not Found: there is no such user.' })
+  @ApiPaginatedResponse(ProjectDto)
+  @Get(':username')
+  async getUserProjectsAsCollaborator(
+    @Param('username') username: string,
+    @Query() { offset, limit }: PaginationParams,
+  ) {
+    return this.projectsService.getUserProjects(username, offset, limit);
+  }
+
   @ApiOperation({ description: 'Get project by id' })
   @ApiOkResponse({
     type: ProjectDto,

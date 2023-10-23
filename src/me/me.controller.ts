@@ -10,11 +10,15 @@ import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { Project } from 'src/projects/schemas/project.schema';
 import { ApiTags } from '@nestjs/swagger';
+import { ProjectsService } from 'src/projects/projects.service';
 
 @ApiTags('Me')
 @Controller('me')
 export class MeController {
-  constructor(private meService: MeService) {}
+  constructor(
+    private meService: MeService,
+    private projectsService: ProjectsService,
+  ) {}
 
   @Get()
   @Auth(Role.Admin)
@@ -43,7 +47,7 @@ export class MeController {
     return this.meService.getContacts(user.sub);
   }
 
-  @Patch('activities')
+  @Patch('contacts')
   @Auth(Role.Admin)
   async updateContacts(
     @User() user: UserFromAuth,
@@ -57,15 +61,11 @@ export class MeController {
   async getAssignedProjects(
     @User() user: UserFromAuth,
     @Query() { offset, limit }: PaginationParams,
-    @Query('sort') sort: string,
-    @Query('fields') fields: string,
   ): Promise<PaginatedResponse<Project>> {
-    return this.meService.getAssignedProjects(
-      user.sub,
+    return this.projectsService.getAssignedProjects(
+      user.username,
       offset,
-      sort,
       limit,
-      fields,
     );
   }
 
@@ -74,15 +74,7 @@ export class MeController {
   async getUserProjects(
     @User() user: UserFromAuth,
     @Query() { offset, limit }: PaginationParams,
-    @Query('sort') sort: string,
-    @Query('fields') fields: string,
   ): Promise<PaginatedResponse<Project>> {
-    return this.meService.getUserProjects(
-      user.sub,
-      offset,
-      sort,
-      limit,
-      fields,
-    );
+    return this.projectsService.getUserProjects(user.username, offset, limit);
   }
 }
