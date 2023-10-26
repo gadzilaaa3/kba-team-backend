@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class Activities {
+export class ActivitiesDto {
   @ApiProperty()
   _id: string;
 

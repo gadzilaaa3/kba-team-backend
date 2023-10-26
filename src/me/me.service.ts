@@ -3,7 +3,6 @@ import { ActivitiesService } from 'src/activities/activities.service';
 import { UpdateActivitiesDto } from 'src/activities/dto/update-activities.dto';
 import { ContactsService } from 'src/contacts/contacts.service';
 import { UpdateContactsDto } from 'src/contacts/dto/update-contacts.dto';
-import { ProjectsService } from 'src/projects/projects.service';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class MeService {
     private usersService: UsersService,
     private activitiesService: ActivitiesService,
     private contactsService: ContactsService,
-    private projectsService: ProjectsService,
   ) {}
 
   async getYourSelf(userId: string) {

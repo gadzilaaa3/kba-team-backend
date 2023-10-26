@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Activities } from 'src/activities/activities.interface';
-import { Contacts } from 'src/contacts/contacts.interface';
+import { ActivitiesDto } from 'src/activities/activities.interface';
+import { ContactsDto } from 'src/contacts/contacts.interface';
 
 export class UserDto {
   @ApiProperty()
@@ -19,8 +19,8 @@ export class UserDto {
   updatedAt: Date;
 
   @ApiProperty()
-  activities: Activities;
+  activities: ActivitiesDto;
 
   @ApiProperty()
-  contacts: Contacts;
+  contacts: ContactsDto;
 }

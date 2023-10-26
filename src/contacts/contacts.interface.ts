@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class Contacts {
+export class ContactsDto {
   @ApiProperty()
   _id: string;
 
