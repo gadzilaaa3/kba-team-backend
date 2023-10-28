@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 // import { Link } from 'src/links/schemas/link.schema';
 
 export type ImageDocument = HydratedDocument<Image>;

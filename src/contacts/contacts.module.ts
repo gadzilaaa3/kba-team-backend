@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ContactsService } from './contacts.service';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ContactsService } from './contacts.service';
 import { Contacts, ContactsSchema } from './schemas/contacts.schema';
 
 @Module({

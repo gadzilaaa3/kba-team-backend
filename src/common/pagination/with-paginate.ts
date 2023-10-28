@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
-import { PaginatedResponse } from './types/pagination-response.type';
 import {
   PaginateResponseWithQuery,
   PaginationQuery,
 } from './types/paginate-response-with-query.type';
+import { PaginatedResponse } from './types/pagination-response.type';
 
 export class WithPaginate {
   private static limit = 100;

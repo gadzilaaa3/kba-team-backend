@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { Contacts, ContactsDocument } from './schemas/contacts.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateContactsDto } from './dto/create-contacts.dto';
 import { UpdateContactsDto } from './dto/update-contacts.dto';
+import { Contacts, ContactsDocument } from './schemas/contacts.schema';
 
 @Injectable()
 export class ContactsService {

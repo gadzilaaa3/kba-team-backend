@@ -5,16 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Project, ProjectDocument } from './schemas/project.schema';
 import { Model } from 'mongoose';
-import { CreateProjectDto } from './dto/create-project.dto';
 import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
-import { Projection } from 'src/common/types/projectionType.type';
 import { FilterType } from 'src/common/types/filterType.type';
-import { UpdateProjectDto } from './dto/update-project.dto';
-import { UpdateCollaboratorsDto } from './dto/update-collaborators.dto';
+import { Projection } from 'src/common/types/projectionType.type';
 import { UsersService } from 'src/users/users.service';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateCollaboratorsDto } from './dto/update-collaborators.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { Project, ProjectDocument } from './schemas/project.schema';
 
 @Injectable()
 export class ProjectsService {

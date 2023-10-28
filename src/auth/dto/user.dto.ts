@@ -1,5 +1,3 @@
-import { Role } from 'src/roles/enums/role.enum';
-
 export interface UserDto {
   id?: string;
 

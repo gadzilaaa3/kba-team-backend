@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { IImageResponse } from './dto/image-response.dto';
 import { path } from 'app-root-path';
-import { writeFile, ensureDir } from 'fs-extra';
+import { ensureDir, writeFile } from 'fs-extra';
+import { IImageResponse } from './dto/image-response.dto';
 
 @Injectable()
 export class ImagesService {

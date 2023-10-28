@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ResetToken, ResetTokenDocument } from './schemas/reset-token.schema';
 import { Model } from 'mongoose';
 import { CreateResetTokenDto } from './dto/create-reset-token.dto';
+import { ResetToken, ResetTokenDocument } from './schemas/reset-token.schema';
 
 @Injectable()
 export class ResetTokensService {

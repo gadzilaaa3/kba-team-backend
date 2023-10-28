@@ -1,25 +1,23 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
-import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { HashService } from 'src/common/services/hash.service';
+import { MailService } from 'src/mail/mail.service';
+import { ResetTokensService } from 'src/reset-tokens/reset-tokens.service';
 import { TokensService } from 'src/tokens/tokens.service';
+import { UsersService } from 'src/users/users.service';
 import { AuthDto } from './dto/auth.dto';
 import { ForgotDto } from './dto/forgot.dto';
 import { ResetDto } from './dto/reset.dto';
-import { ResetTokensService } from 'src/reset-tokens/reset-tokens.service';
-import { MailService } from 'src/mail/mail.service';
-import { TokenExpires } from './tokenExpires';
-import { UserDto } from './dto/user.dto';
 import { TokensDto } from './dto/tokens.dto';
-import { HashService } from 'src/common/services/hash.service';
+import { UserDto } from './dto/user.dto';
+import { TokenExpires } from './tokenExpires';
 
 @Injectable()
 export class AuthService {
@@ -33,34 +31,6 @@ export class AuthService {
   ) {}
 
   private static countUserSession = 2;
-
-  async register(createUserDto: CreateUserDto): Promise<TokensDto> {
-    // Check if user exists
-    let userExists = await this.usersService.findOne(
-      { username: createUserDto.username },
-      { _id: true },
-    );
-    if (userExists) {
-      throw new ConflictException('User already exists');
-    }
-    userExists = await this.usersService.findOne(
-      { email: createUserDto.email },
-      { _id: true },
-    );
-    if (userExists) {
-      throw new ConflictException('User already exists');
-    }
-
-    // Hash password
-    const hash = await HashService.hashData(createUserDto.password);
-    const newUser = await this.usersService.create({
-      ...createUserDto,
-      password: hash,
-    });
-    const tokens = await this.getTokens(newUser);
-    await this.saveRefreshToken(newUser.id, tokens.refreshToken);
-    return tokens;
-  }
 
   async login(authDto: AuthDto): Promise<TokensDto> {
     // Check if user exists

@@ -1,14 +1,4 @@
 import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
-import { Auth } from 'src/common/decorators/auth.decorator';
-import { User } from 'src/common/decorators/user.decorator';
-import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
-import { Role } from 'src/roles/enums/role.enum';
-import { MeService } from './me.service';
-import { UpdateActivitiesDto } from 'src/activities/dto/update-activities.dto';
-import { UpdateContactsDto } from 'src/contacts/dto/update-contacts.dto';
-import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
-import { Project } from 'src/projects/schemas/project.schema';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -19,12 +9,22 @@ import {
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ProjectsService } from 'src/projects/projects.service';
-import { UserDto } from 'src/users/user.interface';
 import { ActivitiesDto } from 'src/activities/activities.interface';
-import { ContactsDto } from 'src/contacts/contacts.interface';
+import { UpdateActivitiesDto } from 'src/activities/dto/update-activities.dto';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { User } from 'src/common/decorators/user.decorator';
+import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
+import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
+import { ContactsDto } from 'src/contacts/contacts.interface';
+import { UpdateContactsDto } from 'src/contacts/dto/update-contacts.dto';
 import { ProjectDto } from 'src/projects/project.interface';
+import { ProjectsService } from 'src/projects/projects.service';
+import { Project } from 'src/projects/schemas/project.schema';
+import { Role } from 'src/roles/enums/role.enum';
+import { UserDto } from 'src/users/user.interface';
+import { MeService } from './me.service';
 
 @ApiTags('Me')
 @Controller('me')

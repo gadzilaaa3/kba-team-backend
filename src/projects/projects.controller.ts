@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,12 +10,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ProjectsService } from './projects.service';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { Auth } from 'src/common/decorators/auth.decorator';
-import { Role } from 'src/roles/enums/role.enum';
-import { User } from 'src/common/decorators/user.decorator';
-import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -31,15 +24,21 @@ import {
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { User } from 'src/common/decorators/user.decorator';
+import { PaginatedDto } from 'src/common/interfaces/paginated.dto';
+import { UserFromAuth } from 'src/common/interfaces/user-from-auth.interface';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { Project } from './schemas/project.schema';
 import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { ValidateMongoId } from 'src/common/pipes/mongoId.pipe';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { Role } from 'src/roles/enums/role.enum';
+import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateCollaboratorsDto } from './dto/update-collaborators.dto';
-import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
-import { PaginatedDto } from 'src/common/interfaces/paginated.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectDto } from './project.interface';
+import { ProjectsService } from './projects.service';
+import { Project } from './schemas/project.schema';
 
 @ApiTags('Projects')
 @ApiExtraModels(PaginatedDto)

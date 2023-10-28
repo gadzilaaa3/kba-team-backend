@@ -6,8 +6,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImagesService } from './images.service';
 import { ApiTags } from '@nestjs/swagger';
+import { ImagesService } from './images.service';
 
 @ApiTags('Media')
 @Controller('images')

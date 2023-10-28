@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ImagesService } from './images.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { ImagesController } from './images.controller';
 import { path } from 'app-root-path';
+import { ImagesController } from './images.controller';
+import { ImagesService } from './images.service';
 
 @Module({
   imports: [

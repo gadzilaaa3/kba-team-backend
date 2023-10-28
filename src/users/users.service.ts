@@ -1,23 +1,16 @@
-import {
-  BadRequestException,
-  ConflictException,
-  HttpCode,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from 'src/roles/enums/role.enum';
-import { Projection } from 'src/common/types/projectionType.type';
-import { FilterType } from 'src/common/types/filterType.type';
 import { ActivitiesService } from 'src/activities/activities.service';
-import { ContactsService } from 'src/contacts/contacts.service';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
-import { PaginationParams } from 'src/common/pagination/paginationParams';
+import { FilterType } from 'src/common/types/filterType.type';
+import { Projection } from 'src/common/types/projectionType.type';
+import { ContactsService } from 'src/contacts/contacts.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -72,27 +65,5 @@ export class UsersService {
 
   async findOne(filter?: FilterType<User>, projection?: Projection<User>) {
     return this.userModel.findOne(filter, projection).exec();
-  }
-
-  async setRoles(userId: string, roles: Role[]) {
-    const user = await this.findById(userId, { roles: 1 });
-
-    if (!user) {
-      throw new NotFoundException('There is no such user');
-    }
-
-    if (
-      user.roles.includes(Role.SuperAdmin) &&
-      !roles.includes(Role.SuperAdmin)
-    ) {
-      throw new ConflictException(
-        'You cannot deprive a user of the super admin role',
-      );
-    }
-
-    const rolesSet = new Set(roles);
-    const rolesArray = Array(...rolesSet);
-
-    return await this.update(user.id, { roles: rolesArray });
   }
 }

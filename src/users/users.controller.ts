@@ -1,33 +1,21 @@
+import { Controller, Get, HttpCode, Param, Query } from '@nestjs/common';
 import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Param,
-  Patch,
-  Query,
-} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { Role } from 'src/roles/enums/role.enum';
-import { Auth } from 'src/common/decorators/auth.decorator';
-import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiConflictResponse,
   ApiExtraModels,
   ApiForbiddenResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UpdateRolesDto } from './dto/update-roles.dto';
-import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { UserDto } from './user.interface';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
+import { Auth } from 'src/common/decorators/auth.decorator';
 import { PaginatedDto } from 'src/common/interfaces/paginated.dto';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
+import { Role } from 'src/roles/enums/role.enum';
+import { UserDto } from './user.interface';
+import { UsersService } from './users.service';
 
 @ApiTags('Users')
 @Controller('users')
@@ -64,25 +52,5 @@ export class UsersController {
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(id, { password: 0, roles: 0 });
-  }
-
-  @ApiOperation({
-    description:
-      'Change the array of user roles. Available only to users with the super-admin role',
-  })
-  @ApiBearerAuth()
-  @ApiBadRequestResponse({
-    description:
-      'Bad Request: each value in roles must be one of the following values: user, admin, super-admin',
-  })
-  @ApiNotFoundResponse({ description: 'Not Found: there is no such user' })
-  @ApiConflictResponse({
-    description: 'Conflict: you cannot deprive a user of the super admin role',
-  })
-  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
-  @Auth(Role.SuperAdmin)
-  @Patch(':id/roles')
-  setRoles(@Param('id') id: string, @Body() { roles }: UpdateRolesDto) {
-    return this.usersService.setRoles(id, roles);
   }
 }

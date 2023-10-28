@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { TokensService } from './tokens.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Token, TokenSchema } from './schemas/token.schema';
+import { TokensService } from './tokens.service';
 
 @Module({
   providers: [TokensService],

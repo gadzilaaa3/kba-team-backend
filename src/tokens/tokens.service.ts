@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Token, TokenDocument } from './schemas/token.schema';
 import { Model } from 'mongoose';
 import { CreateTokenDto } from './dto/create-token.dto';
 import { UpdateTokenDto } from './dto/update-token.dto';
+import { Token, TokenDocument } from './schemas/token.schema';
 
 @Injectable()
 export class TokensService {

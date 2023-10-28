@@ -1,13 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsUrl,
-  IsArray,
-  ValidateNested,
-  IsDate,
-  IsOptional,
-  Validate,
-} from 'class-validator';
+import { IsArray, IsDate, IsOptional, IsUrl } from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({

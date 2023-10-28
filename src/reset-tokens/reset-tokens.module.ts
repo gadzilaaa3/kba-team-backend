@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ResetTokensService } from './reset-tokens.service';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ResetTokensService } from './reset-tokens.service';
 import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
 
 @Module({
