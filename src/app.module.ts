@@ -16,6 +16,7 @@ import { ResetTokensModule } from './reset-tokens/reset-tokens.module';
 import { RolesModule } from './roles/roles.module';
 import { TokensModule } from './tokens/tokens.module';
 import { UsersModule } from './users/users.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -46,7 +47,7 @@ import { UsersModule } from './users/users.module';
     AdminModule,
     GlobalJwtModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,
