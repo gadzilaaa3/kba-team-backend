@@ -117,12 +117,11 @@ export class MeController {
   @Auth(Role.Admin)
   async getAssignedProjects(
     @User() user: UserFromAuth,
-    @Query() { offset, limit }: PaginationParams,
+    @Query() paginationParams: PaginationParams,
   ): Promise<PaginatedResponse<Project>> {
     return this.projectsService.getAssignedProjects(
+      paginationParams,
       user.username,
-      offset,
-      limit,
     );
   }
 
@@ -141,8 +140,11 @@ export class MeController {
   @Auth(Role.Admin)
   async getUserProjects(
     @User() user: UserFromAuth,
-    @Query() { offset, limit }: PaginationParams,
+    @Query() paginationParams: PaginationParams,
   ): Promise<PaginatedResponse<Project>> {
-    return this.projectsService.getUserProjects(user.username, offset, limit);
+    return this.projectsService.getUserProjects(
+      paginationParams,
+      user.username,
+    );
   }
 }

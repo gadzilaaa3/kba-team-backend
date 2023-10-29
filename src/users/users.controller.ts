@@ -1,19 +1,16 @@
 import { Controller, Get, HttpCode, Param, Query } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiBadRequestResponse,
   ApiExtraModels,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiTooManyRequestsResponse,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
-import { Auth } from 'src/common/decorators/auth.decorator';
 import { PaginatedDto } from 'src/common/interfaces/paginated.dto';
 import { PaginationParams } from 'src/common/pagination/paginationParams';
-import { Role } from 'src/roles/enums/role.enum';
 import { UserDto } from './user.interface';
 import { UsersService } from './users.service';
 
@@ -27,28 +24,31 @@ export class UsersController {
     description:
       'Find all users with pagination, available only to users with the super-admin role',
   })
-  @ApiBearerAuth()
   @ApiPaginatedResponse(UserDto)
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiBadRequestResponse({
+    description: 'Bad Request: check the query parameters.',
+  })
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   @HttpCode(200)
-  @Auth(Role.SuperAdmin)
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+  })
   @Get()
-  async findMany(@Query() paginationParams: PaginationParams) {
-    return this.usersService.findMany(paginationParams);
+  async findMany(
+    @Query() paginationParams: PaginationParams,
+    @Query('search') search?: string,
+  ) {
+    return this.usersService.findMany(paginationParams, search);
   }
 
   @ApiOperation({
     description:
       'Find a user by ID, available only to users with the super-admin role',
   })
-  @ApiBearerAuth()
   @ApiOkResponse({ description: 'Ok', type: UserDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
-  @Auth(Role.SuperAdmin)
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(id, { password: 0, roles: 0 });

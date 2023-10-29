@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PaginationParams } from 'src/common/pagination/paginationParams';
 import { PaginatedResponse } from 'src/common/pagination/types/pagination-response.type';
 import { WithPaginate } from 'src/common/pagination/with-paginate';
 import { FilterType } from 'src/common/types/filterType.type';
@@ -66,8 +67,7 @@ export class ProjectsService {
   }
 
   async findMany(
-    offset: number = 0,
-    limit: number = 20,
+    paginationParams: PaginationParams,
     filter?: FilterType<Project>,
   ): Promise<PaginatedResponse<Project>> {
     const query = this.projectModel.find(filter);
@@ -77,7 +77,12 @@ export class ProjectsService {
 
     const total = await this.projectModel.countDocuments(filter);
 
-    return WithPaginate.paginate<Project>(query, offset, limit, total);
+    return WithPaginate.paginate<Project>(
+      query,
+      paginationParams.offset,
+      paginationParams.limit,
+      total,
+    );
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
@@ -157,9 +162,8 @@ export class ProjectsService {
   }
 
   async getAssignedProjects(
+    paginationParams: PaginationParams,
     username: string,
-    offset: number = 0,
-    limit?: number,
   ) {
     const user = await this.usersService.findOne({ username }, { id: 1 });
 
@@ -167,19 +171,19 @@ export class ProjectsService {
       throw new NotFoundException('There is no user with such username.');
     }
 
-    return this.findMany(offset, limit, {
+    return this.findMany(paginationParams, {
       assigned: user.id,
     });
   }
 
-  async getUserProjects(username: string, offset: number = 0, limit?: number) {
+  async getUserProjects(paginationParams: PaginationParams, username: string) {
     const user = await this.usersService.findOne({ username }, { id: 1 });
 
     if (!user) {
       throw new NotFoundException('There is no user with such username.');
     }
 
-    return this.findMany(offset, limit, {
+    return this.findMany(paginationParams, {
       collaborators: user.id,
     });
   }

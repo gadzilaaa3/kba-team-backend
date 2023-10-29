@@ -36,9 +36,12 @@ export class UsersService {
 
   async findMany(
     paginationParams: PaginationParams,
+    search?: string,
   ): Promise<PaginatedResponse<User>> {
-    const query = this.userModel.find({}, { roles: 0 });
-    const total = await this.userModel.countDocuments();
+    const regex = new RegExp(search, 'i');
+    const filter = { username: regex };
+    const query = this.userModel.find(filter, { roles: 0 });
+    const total = await this.userModel.countDocuments(filter);
     return WithPaginate.paginate<User>(
       query,
       paginationParams.offset,

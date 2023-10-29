@@ -20,6 +20,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
@@ -49,14 +50,22 @@ export class ProjectsController {
   @ApiOperation({ description: 'Get all projects with paginate.' })
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   @ApiBadRequestResponse({
-    description: 'Bad Request: check query parameters.',
+    description: 'Bad Request: check the query parameters.',
   })
   @ApiPaginatedResponse(ProjectDto)
+  @ApiQuery({
+    name: 'search',
+    type: String,
+    required: false,
+  })
   @Get()
   findMany(
-    @Query() { offset, limit }: PaginationParams,
+    @Query() paginationParams: PaginationParams,
+    @Query('search') search: string,
   ): Promise<PaginatedResponse<Project>> {
-    return this.projectsService.findMany(offset, limit);
+    const regex = new RegExp(search, 'i');
+    const filter = { username: regex };
+    return this.projectsService.findMany(paginationParams, filter);
   }
 
   @ApiOperation({ description: 'Get a list of projects created by the user.' })
@@ -69,9 +78,9 @@ export class ProjectsController {
   @Get('assigned/:username')
   async getUserAssignedProjects(
     @Param('username') username: string,
-    @Query() { offset, limit }: PaginationParams,
+    @Query() paginationParams: PaginationParams,
   ) {
-    return this.projectsService.getAssignedProjects(username, offset, limit);
+    return this.projectsService.getAssignedProjects(paginationParams, username);
   }
 
   @ApiOperation({ description: 'Get user projects as a collaborator.' })
@@ -84,9 +93,9 @@ export class ProjectsController {
   @Get(':username')
   async getUserProjectsAsCollaborator(
     @Param('username') username: string,
-    @Query() { offset, limit }: PaginationParams,
+    @Query() paginationParams: PaginationParams,
   ) {
-    return this.projectsService.getUserProjects(username, offset, limit);
+    return this.projectsService.getUserProjects(paginationParams, username);
   }
 
   @ApiOperation({ description: 'Get project by id' })
