@@ -1,8 +1,8 @@
 {
   "name": "kba-team-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "REST API for kba-team site",
+  "author": "kba-team",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
